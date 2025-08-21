@@ -1,0 +1,224 @@
+{
+  "name": "Programming Workshops",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1lpHRK3CBxGbD0CTZ2TzYgpt7Ew6oEJTHKnBVZncKg4o",
+          "mode": "list",
+          "cachedResultName": "Programming Workshops Registration  (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lpHRK3CBxGbD0CTZ2TzYgpt7Ew6oEJTHKnBVZncKg4o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1022418738,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lpHRK3CBxGbD0CTZ2TzYgpt7Ew6oEJTHKnBVZncKg4o/edit#gid=1022418738"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -128
+      ],
+      "id": "04b526c6-5e6c-47d3-963c-ce07ce951628",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "2MU2Pd5BObaVrXm3",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1lpHRK3CBxGbD0CTZ2TzYgpt7Ew6oEJTHKnBVZncKg4o",
+          "mode": "list",
+          "cachedResultName": "Programming Workshops Registration  (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lpHRK3CBxGbD0CTZ2TzYgpt7Ew6oEJTHKnBVZncKg4o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1396087236,
+          "mode": "list",
+          "cachedResultName": "Workshop Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1lpHRK3CBxGbD0CTZ2TzYgpt7Ew6oEJTHKnBVZncKg4o/edit#gid=1396087236"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Workshop",
+              "lookupValue": "={{ $json.Workshop }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        -128
+      ],
+      "id": "df68c88a-483a-4c05-baca-d4ee901f166b",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Q5HkAirnTFzaCuKX",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ad6c5e90-153e-42f7-b39f-fcedcb276f0b",
+              "leftValue": "={{ $now.format('yyyy-MM-dd HH:mm') }}",
+              "rightValue": "={{ $json['Reminder DateTime'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        96,
+        80
+      ],
+      "id": "6fbb4039-ee81-48cc-94eb-5bd56835fcd3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Email Address'] }}",
+        "subject": "=Reminder: {{ $('Google Sheets Trigger').item.json.Workshop }} in 5h",
+        "message": "=Hello {{ $('Google Sheets Trigger').item.json['Full Name'] }},<br><br>\n\nThis is a friendly reminder that your <b>{{ $('Google Sheets Trigger').item.json.Workshop }}</b> workshop will start in 5 hours. 🚀<br><br>\n\n📅 <b>Date:</b> {{ $json.Date }}<br>\n⏰ <b>Time:</b> {{ $json.Time }}<br><br>\n\n🔗 <b>Meeting Link:</b> <a href=\"{{ $json['Meeting Link'] }}\">Join Workshop</a><br><br>\n\n📂 <b>Workshop Materials:</b> <a href=\"{{ $json['PDF Link'] }}\">Access Here</a><br><br>\n\nWe look forward to seeing you there!<br><br>\n\nRegards,<br>\nWorkshop Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        368,
+        64
+      ],
+      "id": "61bb796b-986d-4e55-b390-6bab1ccf6a49",
+      "name": "Send a Reminder message",
+      "webhookId": "de8b3818-3766-4594-9e9f-9aa984d88a52",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "adht8vTSzwHtHcCl",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['Email Address'] }}",
+        "subject": "=Your {{ $json[\"Workshop\"] }} Workshop Registration\n",
+        "message": "=Hello {{ $('Google Sheets Trigger').item.json['Full Name'] }},<br><br>\n\nThank you for registering for the <b>{{ $('Google Sheets Trigger').item.json.Workshop }}</b> workshop.<br><br>\n\n📅 <b>Date:</b> {{ $json.Date }}<br>\n⏰ <b>Time:</b> {{ $json.Time }}<br><br>\n\n🔗 <b>Meeting Link:</b> <a href=\"{{ $json['Meeting Link'] }}\">Join Workshop</a><br><br>\n\n📂 <b>Workshop Materials:</b> <a href=\"{{ $json['PDF Link'] }}\">Access Here</a><br><br>\n\nRegards,<br>\nWorkshop Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        -128
+      ],
+      "id": "be265673-d2bf-461f-a875-514e9adeb3f9",
+      "name": "Send a Registration message",
+      "webhookId": "4029df1b-b829-4abd-8e5b-20941a23f10e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "adht8vTSzwHtHcCl",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a Registration message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a Reminder message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a Registration message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3a6e8a02-11a9-4a71-8a93-5e1a122b904b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "986f838f9764a7389a336b50589d5ccb87ed8b53438745614c4f24288322e429"
+  },
+  "id": "OacZCVbEbWL4urKz",
+  "tags": []
+}
